@@ -1,0 +1,255 @@
+#+TITLE: eQTL Analysis in Apache SPARK
+#+AUTHOR: Tammo Rukat
+#+DATE: May 27, 2005
+#+Email: tammorukat@gmail.com
+
+
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:nil reveal_control:f
+#+OPTIONS: reveal_mathjax:t reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1200 reveal_height:800
+#+OPTIONS: toc:1
+# #+REVEAL_MARGIN: 0.01
+#+REVEAL_MIN_SCALE: 0.5
+#+REVEAL_MAX_SCALE: 3.5
+#+REVEAL_TRANS: page 
+#+REVEAL_THEME: league
+ # sky, league, moon, solarized
+#+REVEAL_HLEVEL: 1
+# #+REVEAL_HEAD_PREAMBLE: <meta name="description" content="Org-Reveal Introduction.">
+# #+REVEAL_POSTAMBLE: <p> Created by yjwen. </p>
+#+REVEAL_PLUGINS: (highlight markdown notes)
+# #+REVEAL_EXTRA_CSS: ./local.css
+#+REVEAL_SLIDE_NUMBER: t
+#+REVEAL_DEFAULT_FRAG_STYLE: roll-in
+#+REVEAL_EXTRA_CSS: /org-reveal/local.css
+#+OPTIONS: org-reveal-center:t
+
+# #+REVEAL_TITLE_SLIDE_BACKGROUND: /home/tammo/Dropbox/eQTLs/data_science_meeting/spark-logo2.png
+# #+REVEAL_TITLE_SLIDE_BACKGROUND_SIZE: 400px
+# #+REVEAL_TITLE_SLIDE_BACKGROUND_REPEAT: repeat  
+
+# #+REVEAL_SLIDE_HEADER: eQTL Analysis with Apache Spark
+# #+REVEAL_SLIDE_FOOTER: eQTL Analysis with Apache Spark
+# frage styles are: grow, shrink, roll-in, fade-out, highlight-red/green/blue, appear
+# transitions are:  default|cube|page|concave|zoom|linear|fade|none. 
+# set fragmentation: #+ATTR_REVEAL: :frag t :frag_idx 3
+# #+ATTR_REVEAL: :frag (roll-in roll-in roll-in) :frag_idx(1 2 3)
+
+# #+REVEAL_TITLE_SLIDE_BACKGROUND: /home/tammo/Dropbox/eQTLs/data_science_meeting/spark-logo.png
+
+# * Test
+
+# #+BEGIN_SRC python
+#       if sys.argv[1] == 'sparse_vectors':
+#         SNP_sv = SNP_df_to_labeled_vectors(SNP_df, logger)
+
+#         t1 = time.time()
+#         eQTLs, elapsed = sparse_vector_method(SNP_sv, exp_df, gene_ids,\
+#                                 max_distance = 1e20, sign_level = .75, outname = outname+'.out')
+#         t_m1 = time.time() - t1
+#         logger.info('sparse_vector took '+str(t_m1))
+# #+END_SRC
+
+# ${ \frac{1}{2} }$
+     
+# #+REVEAL_HTML: <iframe width="560" height="315" src="https://www.youtube.com/embed/OQzJR3BqS7o" frameborder="0" allowfullscreen></iframe>
+
+# # #+ATTR_REVEAL: :frag t
+# - item1
+# - item2 
+
+# #+BEGIN_NOTES
+# This is some fun slide. Keep on rockin'!
+# #+END_NOTES
+
+
+* Apache Spark
+  :PROPERTIES:
+  :reveal_background: figures/spark-logo5.png
+  :reveal_background_trans: none
+  :END:
+
+  - Originated 2009 at UC Berkeley
+  - Most active Apache project and most active open source big data project (by the number of contributors)
+  - Allows repeated queries to data in cluster memory
+    - For *iterative* algorithms.
+    - For *interactive* queries.
+    - Hadoop: .map() -> .reduce() -> write to disk
+  - Works on top of various cluster managers and data storage systems
+  - Written in Scala, but APIs availabe in Python, Java, R. 
+
+#+BEGIN_NOTES
+  - Still developed in very 'academic spirit'.
+  - Cluster manager: Standalone, Hadoop YARN, Apache Mesos
+  - Storage systems: HDFS, Amazon S3...
+#+END_NOTES
+		  
+** Resilient Distributed Dataset (RDD) - Sparks main abstraction
+  :PROPERTIES:
+  :reveal_background: figures/spark-logo5.png
+  :reveal_background_trans: none
+  :END:
+
+#+ATTR_REVEAL: :frag (highlight-blue highlight-blue highlight-blue highlight-blue highlight-blue highlight-blue) :frag_idx (1 2 3 4 5 6)
+- A read only collection of Objects (e.g. lists, arrays, strings, variables, ...)
+- Partitioned across machines
+- Undergoing parallel operations
+- Resides in Memory
+- Evaluation is *lazy*
+- RDDs are ephemeral, but there lineage is tracked.
+# - Computation happens were the data i
+
+** Processing a text file with the Spark Python API
+  :PROPERTIES:
+  :reveal_background: figures/spark-logo5.png
+  :reveal_background_trans: none
+  :END:
+
+#+BEGIN_SRC 
+##fileformat=VCFv4.1
+##dummy example of a genotype file 				
+#CHROM	POS     ID     REF	ALT	QUAL	HG1	HG2	HG3	HG4   ...	
+22	160575	rs58769  A	G	PASS	1|0	0|0     0|0	0|0   ...
+22	160576	rs58762	 G	A,C	PASS	0|0	2|2	0|0	0|0   ...
+22	160577	rs58763	 C	TATA	PASS	1|1	0|0	0|0	0|1   ...
+22	160578	rs58764	 C	T       PASS	0|0	0|0	0|0	0|0   ...
+22	160579	rs58767	 C	A	PASS	0|0	0|0	0|0	0|0   ...
+#+END_SRC
+
+#+ATTR_REVEAL: :frag t 
+Clean up comments and columns 
+#+ATTR_REVEAL: :frag t 
+   #+BEGIN_SRC python
+   genotype = spark.textFile('input.txt')
+   genotype = genotype.filter(lambda row: row[0] != '#').map(lambda row: row.split('\t'))
+   #+END_SRC
+
+#+ATTR_REVEAL: :frag t 
+If we force computation, the output reads:
+
+#+ATTR_REVEAL: :frag t 
+#+BEGIN_SRC python
+[[22, 160575, 'rs58769', 'A', 'G',    'PASS', '1|0', '0|0','0|0','0|0']
+ [22, 160576, 'rs58762', 'G', 'A,C',  'PASS', '0|0', '2|2','0|0','0|0']
+ [22, 160577, 'rs58763', 'C', 'TATA', 'PASS', '1|1', '0|0','0|0','0|1']
+ [22, 160578, 'rs58764', 'C', 'T',    'PASS', '0|0', '0|0','0|0','0|0']
+ [22, 160579, 'rs58767', 'C', 'A',    'PASS', '0|0', '0|0','0|0','0|0']]
+#+END_SRC
+
+
+** Spark data frames
+  :PROPERTIES:
+  :reveal_background: figures/spark-logo5.png
+  :reveal_background_trans: none
+  :END:
+
+   - Like data frames in R or python pandas library
+   - Allow all common relational operations (select, filter, join, ...)
+   - Supports SQL queries.
+
+#+ATTR_REVEAL: :frag t 
+Find a particular SNP
+
+#+ATTR_REVEAL: :frag t 
+#+BEGIN_SRC python
+SNP_df.filter(SNP_df.POS == 160576).show()
+#+END_SRC
+
+#+ATTR_REVEAL: :frag t
+#+BEGIN_SRC python
+POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
+160576 rs58769 GtoA     0   0   0   0   0   0   0   0   ...
+160576 rs58769 GtoC     0   0   0   0   0   0   0   0   ...
+#+END_SRC
+
+
+#+ATTR_REVEAL: :frag t 
+Find polymorphisms for a particular sample
+#+ATTR_REVEAL: :frag t 
+#+BEGIN_SRC python
+SNP_df.where(SNP_df[HG7] >= 1).show()
+#+END_SRC
+
+#+ATTR_REVEAL: :frag t 
+#+BEGIN_SRC python
+POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
+160577 rs58764 CtoTATA  2   0   0   1   0   1   1   0   ...     
+160581 rs58768 GtoACG   1   0   1   0   1   0   2   0   ...      
+#+END_SRC
+
+
+
+
+# show output and example queries
+
+* eQTL Analysis in Spark
+
+** Cis Analysis with Cartesian Product Method
+1. _Load and cache_ the data into *distributed* Spark data frames
+2. _Select_ the quantitative traits (genes) for analysis.
+3. _Broadcast_ an array with the _position_ of the genes to every worker node
+
+#+ATTR_REVEAL: :frag t
+_Iterate_ for every gene:
+#+ATTR_REVEAL: :frag t
+1. _Filter_ SNPs to be close enough (cis) to the current gene.
+2. _Broadcast_ the _gene's expression_ data to every worker node.
+3. _Calculate correlations_ of the gene expression with every SNP.
+
+#+ATTR_REVEAL: :frag t
+=4.= Join results into data frame.
+
+
+** Example Query
+Genotype and expression data have been loaded into data frames.
+#+BEGIN_SRC python
+gene_ids = 'all'
+eQTLs = cartesian_product_method(SNP_df, exp_df, gene_ids,max_distance=1e6,\
+                                sign_level = .75, Noutname = 'my_eQTL_analysis.out')
+eQTLs.show()
+#+END_SRC
+
+#+ATTR_REVEAL: :frag t
+... wait a minute ...
+
+#+ATTR_REVEAL: :frag t
+#+BEGIN_SRC python
+CHROM ENTREZ_ID SNP_POSITION REFtoALT CORR  
+chr15 1033415   16051        GtoACG   0.7368807  
+chr15 1033415   16055        AtoG     0.6830418  
+chr15 1033422   16055        AtoG     0.6285847  
+chr15 1033422   16059        CtoA     0.6669201  
+chr15 1033415   16075        AtoG     0.7927461  
+chr15 1033415   16059        CtoA     0.5015037  
+chr15 1033422   16050        CtoA     0.6285847  
+chr15 1033415   16050        CtoA     0.8927461  
+chr15 1033423   16055        AtoG     0.6175155  
+chr15 1033423   16059        CtoA     0.7690654  
+chr15 1033423   16050        CtoA     0.6175155  
+#+END_SRC
+
+*** Benchmark
+     [[./figures/benchmark_cpm_1_1.png]]
+     
+** Sparse Vector Method
+*** Benchmark
+     [[./figures/benchmark_cpm_1_2.png]]
+
+** Ressource Dependency: Benchmark
+
+#+REVEAL_HTML: <img src="figures/bm_half.png" frameborder="0" align="middle"> <br>  
+- Scales nicely...
+  
+** Ressource Dependency: Benchmark (cont)
+#+REVEAL_HTML: <img src="figures/bm_full.png" frameborder="0" align="middle"> <br>  
+- ... up to 48 cores
+
+
+* Future Work
+  - Statistical tests
+    + Simple significance test with multiple comparsion correction.
+    + Resampling tests.
+  - Implement Matrix method to avoid iterations.
+  - Perform larger analyses (e.g. across chromosomes)
+
+% #+ REVEAL: split
