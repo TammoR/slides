@@ -65,8 +65,8 @@
 * Apache Spark
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
-  :reveal_background_size: 1000px
-  :reveal_background_trans: none
+  :reveal_background_size: 600px
+  :reveal_background_trans: fading
   :END:
 
   - Originated 2009 at UC Berkeley
@@ -87,8 +87,8 @@
 ** Resilient Distributed Dataset (RDD) - Sparks main abstraction
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
-  :reveal_background_size: 1000px
-  :reveal_background_trans: none
+  :reveal_background_size: 700px
+  :reveal_background_trans: fading
   :END:
 
 #+ATTR_REVEAL: :frag (highlight-blue highlight-blue highlight-blue highlight-blue highlight-blue highlight-blue) :frag_idx (1 2 3 4 5 6)
@@ -103,8 +103,8 @@
 ** Processing a text file with the Spark Python API
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
-  :reveal_background_size: 1000px
-  :reveal_background_trans: none
+  :reveal_background_size: 800px
+  :reveal_background_trans: fading
   :END:
 
 #+BEGIN_SRC 
@@ -174,7 +174,8 @@ chr15 25299355 25299452 103414    SNORD116_2   0.143     -1.2503  1.8367   -0.77
 ** Spark data frames
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
-  :reveal_background_trans: none
+  :reveal_background_size: 900px 
+  :reveal_background_trans: fading
   :END:
 
    - Like data frames in R or python pandas library
