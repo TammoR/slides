@@ -6,8 +6,8 @@
 <title>eQTL Analysis in Apache SPARK</title>
 <meta name="author" content="(Tammo Rukat)"/>
 
-<link rel="stylesheet" href="file:./reveal.js/css/reveal.css"/>
-<link rel="stylesheet" href="file:./reveal.js/css/theme/league.css" id="theme"/>
+<link rel="stylesheet" href="./css/reveal.css"/>
+<link rel="stylesheet" href="./css/theme/league.css" id="theme"/>
 <link rel="stylesheet" href="/org-reveal/local.css"/>
 <!-- If the query includes 'print-pdf', include the PDF print sheet -->
 <script>
@@ -15,7 +15,7 @@
         var link = document.createElement( 'link' );
         link.rel = 'stylesheet';
         link.type = 'text/css';
-        link.href = 'file:./reveal.js/css/print/pdf.css';
+        link.href = './css/print/pdf.css';
         document.getElementsByTagName( 'head' )[0].appendChild( link );
     }
 </script>
@@ -309,8 +309,8 @@ chr15 1033423   16050        CtoA     0.6175155
 </div>
 </div>
 
-<script src="file:./reveal.js/lib/js/head.min.js"></script>
-<script src="file:./reveal.js/js/reveal.js"></script>
+<script src="./lib/js/head.min.js"></script>
+<script src="./js/reveal.js"></script>
 
 <script>
 // Full list of configuration options available here:
@@ -341,10 +341,10 @@ multiplex: {
 
 // Optional libraries used to extend on reveal.js
 dependencies: [
- { src: 'file:./reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
- { src: 'file:./reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
- { src: 'file:./reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
- { src: 'file:./reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+ { src: './plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+ { src: './plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: './plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
 ]
 });
 </script>
