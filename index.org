@@ -65,6 +65,7 @@
 * Apache Spark
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
+  :reveal_background_size: 1000px
   :reveal_background_trans: none
   :END:
 
@@ -86,6 +87,7 @@
 ** Resilient Distributed Dataset (RDD) - Sparks main abstraction
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
+  :reveal_background_size: 1000px
   :reveal_background_trans: none
   :END:
 
@@ -101,6 +103,7 @@
 ** Processing a text file with the Spark Python API
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
+  :reveal_background_size: 1000px
   :reveal_background_trans: none
   :END:
 
