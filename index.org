@@ -302,3 +302,9 @@ rs58768  SparseVector(2, {2:2, 4:1})
   - Implement Matrix method to avoid iterations.
   - Perform larger analyses (e.g. across chromosomes)
 
+** Acknowledgments
+Thanks to
+- *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
+- The whole Roche pREDi Data Science II team
+- Our supervisors in Oxford: *Chris Yau* and *Peter Humburg*
+- Our funding: EPSRC
