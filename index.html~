@@ -277,6 +277,13 @@ chr15 1033423   16050        CtoA     0.6175155
 <code>4.</code> Join results into data frame.
 </p>
 
+<aside class="notes">
+<p>
+What is the most time consuming step?
+</p>
+
+</aside>
+
 </section>
 <section id="slide-sec-2-2-1">
 <h4 id="sec-2-2-1">Benchmark</h4>
@@ -349,6 +356,10 @@ rs58768  SparseVector(2, {2:2, 4:1})
 <section id="slide-sec-2-6">
 <h3 id="sec-2-6">Scaling with the number of genes</h3>
 <img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>
+<ul>
+<li>Linear behaviour</li>
+
+</ul>
 
 </section>
 <section id="slide-sec-2-7">

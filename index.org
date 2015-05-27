@@ -271,6 +271,10 @@ _Iterate_ for every gene:
 
 =4.= Join results into data frame.
 
+#+BEGIN_NOTES
+What is the most time consuming step?
+#+END_NOTES
+
 *** Benchmark
      [[./figures/benchmark_cpm_1_1.png]]
 
@@ -310,9 +314,10 @@ rs58768  SparseVector(2, {2:2, 4:1})
 
 ** Scaling with the number of genes
 #+REVEAL_HTML: <img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>  
+- Linear behaviour
 
 ** Scaling with the number of genes [cont]
-#+REVEAL_HTML: <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>  
+#+REVEAL_HTML: <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
 
 * Future Work
 #+ATTR_REVEAL: :frag (highlight-red highlight-red highlight-red highlight-blue highlight-blue)
@@ -327,6 +332,6 @@ rs58768  SparseVector(2, {2:2, 4:1})
 ** Acknowledgments
 Thanks to
 - *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
-- The whole Roche pREDi Data Science II team
+- The whole Roche pREDi Data Science
 - Our supervisors in Oxford: *Chris Yau* and *Peter Humburg*
 - Our funding: EPSRC
