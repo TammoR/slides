@@ -116,7 +116,9 @@
 22	160577	rs58763	 C	TATA	PASS	1|1	0|0	0|0	0|1   ...
 22	160578	rs58764	 C	T       PASS	0|0	0|0	0|0	0|0   ...
 22	160579	rs58767	 C	A	PASS	0|0	0|0	0|0	0|0   ...
-#+END_SRC
+.       .       .        .      .       .       .       .       .       .     ...
+.       .       .        .      .       .       .       .       .       .     ...
+#+END_SRC 
 
 #+ATTR_REVEAL: :frag t 
 Clean up comments and columns 
@@ -141,7 +143,7 @@ If we force computation, the output reads:
 
 #+REVEAL: split
 
-Genotype data:
+#+REVEAL_HTML: <font color="red"><div align="left">Genotype data (size: 1e3 x 4e7)</div></font>
 #+BEGIN_SRC python
 POS   ID       REFtoALT HG1     HG2     HG3     HG4     HG5     HG6  ... 
 16077 rs587624 CtoTATA  2       0       0       1       0       1    ...    
@@ -156,7 +158,7 @@ POS   ID       REFtoALT HG1     HG2     HG3     HG4     HG5     HG6  ...
 #+END_SRC
 
 
-Expression data:
+#+REVEAL_HTML: <font color="blue"><div align="left">Expression data (size: 1e3 x 2e5)</div></font>
 #+BEGIN_SRC python
 CHROM START    END      ENTREZ_ID DESCRIPTION  HG1        HG2      HG3      HG4   ...
 chr15 25302005 25302102 133415    SNORD116_3   -1.5092   -1.4306  0.5507   1.3763 ...
@@ -221,9 +223,15 @@ POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 ** Example Query
 Genotype and expression data have been loaded into data frames.
 #+BEGIN_SRC python
+SNP_df = load_genotype_data('genotype.vcf')
+epx_df = load_expression_data('expression.gct')
 gene_ids = 'all'
-eQTLs = cartesian_product_method(SNP_df, exp_df, gene_ids,max_distance=1e6,\
-                                sign_level = .75, Noutname = 'my_eQTL_analysis.out')
+eQTLs = cartesian_product_method(SNP_df, exp_df,\
+                                         gene_ids,\
+                                         max_distance=1e6,\
+                                         sign_level = .6,\
+                                         outname = 'my_eQTL_analysis.out')
+
 eQTLs.show()
 #+END_SRC
 
@@ -238,7 +246,7 @@ chr15 1033415   16055        AtoG     0.6830418
 chr15 1033422   16055        AtoG     0.6285847  
 chr15 1033422   16059        CtoA     0.6669201  
 chr15 1033415   16075        AtoG     0.7927461  
-chr15 1033415   16059        CtoA     0.5015037  
+chr15 1033415   16059        CtoA     0.6015037  
 chr15 1033422   16050        CtoA     0.6285847  
 chr15 1033415   16050        CtoA     0.8927461  
 chr15 1033423   16055        AtoG     0.6175155  
@@ -246,26 +254,30 @@ chr15 1033423   16059        CtoA     0.7690654
 chr15 1033423   16050        CtoA     0.6175155  
 #+END_SRC
 
+** Cis Analysis with Cartesian Product Method
+#+REVEAL_HTML: <ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>  
+
+# 1. _Load and cache_ the data into *distributed* Spark data frames
+# 2. _Select_ the quantitative traits (genes) for analysis.
+# 3. _Broadcast_ an array with the _position_ of the genes to every worker node
+
+_Iterate_ for every gene:
+
+#+REVEAL_HTML: <ol type="a"><li><b>Filter</b> <font color="red">SNPs</font> to be close enough (cis) to the current gene. </li> <li> <b>Broadcast</b> the <font color="blue">gene's expression</font> data to every worker node.</li> <li> <b>Calculate correlations</b> of the gene expression with every SNP.</li></ol>
+
+# 1. _Filter_ SNPs to be close enough (cis) to the current gene.
+# 2. _Broadcast_ the _gene's expression_ data to every worker node.
+# 3. _Calculate correlations_ of the gene expression with every SNP.
+
+=4.= Join results into data frame.
+
 *** Benchmark
      [[./figures/benchmark_cpm_1_1.png]]
 
-** Cis Analysis with Cartesian Product Method
-1. _Load and cache_ the data into *distributed* Spark data frames
-2. _Select_ the quantitative traits (genes) for analysis.
-3. _Broadcast_ an array with the _position_ of the genes to every worker node
-
-#+ATTR_REVEAL: :frag t
-_Iterate_ for every gene:
-#+ATTR_REVEAL: :frag t
-1. _Filter_ SNPs to be close enough (cis) to the current gene.
-2. _Broadcast_ the _gene's expression_ data to every worker node.
-3. _Calculate correlations_ of the gene expression with every SNP.
-
-#+ATTR_REVEAL: :frag t
-=4.= Join results into data frame.
-     
 ** Sparse Vector Method
-Just like before, but the SNP representation exploits the sparsity of the data.
+Just like before, but the SNP representation exploits the sparsity.
+
+Prior representation:
 #+BEGIN_SRC python
 POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 160577 rs58764 CtoTATA  0   0   0   1   0   0   0   0   ...     
@@ -273,7 +285,8 @@ POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 #+END_SRC
 
 #+ATTR_REVEAL: :frag t 
-
+Sparse representation of the same data:
+#+ATTR_REVEAL: :frag t 
 #+BEGIN_SRC python
 ID       HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 rs58764  SparseVector(1, {3:1})            
@@ -294,13 +307,22 @@ rs58768  SparseVector(2, {2:2, 4:1})
 - ... up to 48 cores
 
 
+
+** Scaling with the number of genes
+#+REVEAL_HTML: <img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>  
+
+** Scaling with the number of genes [cont]
+#+REVEAL_HTML: <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>  
+
 * Future Work
-#+ATTR_REVEAL: :frag (highlight-blue highlight-red highlight-blue)
+#+ATTR_REVEAL: :frag (highlight-red highlight-red highlight-red highlight-blue highlight-blue)
+  - Improve the algorithm, especially the search of cis SNPs.
+  - Implement Matrix method to avoid iterations.
+  - Perform larger analyses (e.g. across chromosomes).
   - Statistical tests
     + Simple significance test with multiple comparsion correction.
-    + Resampling tests.
-  - Implement Matrix method to avoid iterations.
-  - Perform larger analyses (e.g. across chromosomes)
+    + Resampling tests, Bootstrap.
+  - Account for covarites (e.g. by principal componente analysis)
 
 ** Acknowledgments
 Thanks to

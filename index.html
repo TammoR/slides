@@ -102,6 +102,8 @@
 22	160577	rs58763	 C	TATA	PASS	1|1	0|0	0|0	0|1   ...
 22	160578	rs58764	 C	T       PASS	0|0	0|0	0|0	0|0   ...
 22	160579	rs58767	 C	A	PASS	0|0	0|0	0|0	0|0   ...
+.       .       .        .      .       .       .       .       .       .     ...
+.       .       .        .      .       .       .       .       .       .     ...
 </pre>
 
 <span class="fragment roll-in"><p>
@@ -132,9 +134,7 @@ If we force computation, the output reads:
 </section>
 <section>
 
-<p>
-Genotype data:
-</p>
+<font color="red"><div align="left">Genotype data (size: 1e3 x 4e7)</div></font>
 <div class="org-src-container">
 
 <pre  class="src src-python">POS   ID       REFtoALT HG1     HG2     HG3     HG4     HG5     HG6  ... 
@@ -151,9 +151,7 @@ Genotype data:
 </div>
 
 
-<p>
-Expression data:
-</p>
+<font color="blue"><div align="left">Expression data (size: 1e3 x 2e5)</div></font>
 <div class="org-src-container">
 
 <pre  class="src src-python">CHROM START    END      ENTREZ_ID DESCRIPTION  HG1        HG2      HG3      HG4   ...
@@ -230,9 +228,15 @@ Genotype and expression data have been loaded into data frames.
 </p>
 <div class="org-src-container">
 
-<pre  class="src src-python"><span style="color: #eedd82;">gene_ids</span> = <span style="color: #ffa07a;">'all'</span>
-<span style="color: #eedd82;">eQTLs</span> = cartesian_product_method(SNP_df, exp_df, gene_ids,max_distance=1e6,\
-                sign_level = .75, Noutname = <span style="color: #ffa07a;">'my_eQTL_analysis.out'</span>)
+<pre  class="src src-python"><span style="color: #eedd82;">SNP_df</span> = load_genotype_data(<span style="color: #ffa07a;">'genotype.vcf'</span>)
+<span style="color: #eedd82;">epx_df</span> = load_expression_data(<span style="color: #ffa07a;">'expression.gct'</span>)
+<span style="color: #eedd82;">gene_ids</span> = <span style="color: #ffa07a;">'all'</span>
+<span style="color: #eedd82;">eQTLs</span> = cartesian_product_method(SNP_df, exp_df,\
+                     gene_ids,\
+                     max_distance=1e6,\
+                     sign_level = .6,\
+                     outname = <span style="color: #ffa07a;">'my_eQTL_analysis.out'</span>)
+
 eQTLs.show()
 </pre>
 </div>
@@ -249,7 +253,7 @@ chr15 1033415   16055        AtoG     0.6830418
 chr15 1033422   16055        AtoG     0.6285847  
 chr15 1033422   16059        CtoA     0.6669201  
 chr15 1033415   16075        AtoG     0.7927461  
-chr15 1033415   16059        CtoA     0.5015037  
+chr15 1033415   16059        CtoA     0.6015037  
 chr15 1033422   16050        CtoA     0.6285847  
 chr15 1033415   16050        CtoA     0.8927461  
 chr15 1033423   16055        AtoG     0.6175155  
@@ -259,8 +263,23 @@ chr15 1033423   16050        CtoA     0.6175155
 </div>
 
 </section>
-<section id="slide-sec-2-1-1">
-<h4 id="sec-2-1-1">Benchmark</h4>
+<section id="slide-sec-2-2">
+<h3 id="sec-2-2">Cis Analysis with Cartesian Product Method</h3>
+<ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>
+
+<p>
+<span class="underline">Iterate</span> for every gene:
+</p>
+
+<ol type="a"><li><b>Filter</b> <font color="red">SNPs</font> to be close enough (cis) to the current gene. </li> <li> <b>Broadcast</b> the <font color="blue">gene's expression</font> data to every worker node.</li> <li> <b>Calculate correlations</b> of the gene expression with every SNP.</li></ol>
+
+<p>
+<code>4.</code> Join results into data frame.
+</p>
+
+</section>
+<section id="slide-sec-2-2-1">
+<h4 id="sec-2-2-1">Benchmark</h4>
 
 <div class="figure">
 <p><img src="./figures/benchmark_cpm_1_1.png" alt="benchmark_cpm_1_1.png" />
@@ -268,34 +287,14 @@ chr15 1033423   16050        CtoA     0.6175155
 </div>
 
 </section>
-<section id="slide-sec-2-2">
-<h3 id="sec-2-2">Cis Analysis with Cartesian Product Method</h3>
-<ol>
-<li><span class="underline">Load and cache</span> the data into <b>distributed</b> Spark data frames</li>
-<li><span class="underline">Select</span> the quantitative traits (genes) for analysis.</li>
-<li><span class="underline">Broadcast</span> an array with the <span class="underline">position</span> of the genes to every worker node</li>
-
-</ol>
-
-<span class="fragment roll-in"><p>
-<span class="underline">Iterate</span> for every gene:
-</p></span>
-<ol class="fragment">
-<li><span class="underline">Filter</span> SNPs to be close enough (cis) to the current gene.</li>
-<li><span class="underline">Broadcast</span> the <span class="underline">gene's expression</span> data to every worker node.</li>
-<li><span class="underline">Calculate correlations</span> of the gene expression with every SNP.</li>
-
-</ol>
-
-<span class="fragment roll-in"><p>
-<code>4.</code> Join results into data frame.
-</p></span>
-
-</section>
 <section id="slide-sec-2-3">
 <h3 id="sec-2-3">Sparse Vector Method</h3>
 <p>
-Just like before, but the SNP representation exploits the sparsity of the data.
+Just like before, but the SNP representation exploits the sparsity.
+</p>
+
+<p>
+Prior representation:
 </p>
 <div class="org-src-container">
 
@@ -305,9 +304,12 @@ Just like before, but the SNP representation exploits the sparsity of the data.
 </pre>
 </div>
 
+<span class="fragment roll-in"><p>
+Sparse representation of the same data:
+</p></span>
 <div class="org-src-container">
 
-<pre  class="src src-python">ID       HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
+<pre  class="fragment roll-in">ID       HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 rs58764  SparseVector(1, {3:1})            
 rs58768  SparseVector(2, {2:2, 4:1})
 </pre>
@@ -342,20 +344,33 @@ rs58768  SparseVector(2, {2:2, 4:1})
 </ul>
 
 
+
+</section>
+<section id="slide-sec-2-6">
+<h3 id="sec-2-6">Scaling with the number of genes</h3>
+<img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>
+
+</section>
+<section id="slide-sec-2-7">
+<h3 id="sec-2-7">Scaling with the number of genes [cont]</h3>
+<img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
+
 </section>
 </section>
 <section>
 <section id="slide-sec-3">
 <h2 id="sec-3">Future Work</h2>
 <ul>
+<li class="fragment highlight-red">Improve the algorithm, especially the search of cis SNPs.</li>
+<li class="fragment highlight-red">Implement Matrix method to avoid iterations.</li>
+<li class="fragment highlight-red">Perform larger analyses (e.g. across chromosomes).</li>
 <li class="fragment highlight-blue">Statistical tests
 <ul>
 <li>Simple significance test with multiple comparsion correction.</li>
-<li>Resampling tests.</li>
+<li>Resampling tests, Bootstrap.</li>
 
 </ul></li>
-<li class="fragment highlight-red">Implement Matrix method to avoid iterations.</li>
-<li class="fragment highlight-blue">Perform larger analyses (e.g. across chromosomes)</li>
+<li class="fragment highlight-blue">Account for covarites (e.g. by principal componente analysis)</li>
 
 </ul>
 
