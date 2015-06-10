@@ -1,6 +1,6 @@
 #+TITLE: eQTL Analysis in Apache SPARK
 #+AUTHOR: Tammo Rukat
-#+DATE: June 15, 2015
+#+DATE: June 10, 2015
 #+Email: tammorukat@gmail.com
 
 
