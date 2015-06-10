@@ -395,7 +395,7 @@ rs58768  SparseVector(2, {2:2, 4:1})
 
 </ul></li>
 <li class="fragment highlight-blue">Account for covarites (e.g. by principal componente analysis)</li>
-<li>Stratified analysis for gender, ethnicity, &#x2026;</li>
+<li class="fragment highlight-blue">Stratified analysis for gender, ethnicity, &#x2026;</li>
 
 </ul>
 
