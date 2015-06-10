@@ -1,0 +1,88 @@
+\documentclass{article}
+
+\usepackage{calc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{relsize}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{tikz}
+\usepackage{caption}
+\usepackage{lipsum}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{multicol}
+
+\usetikzlibrary{calc}
+\input{tikz_fun.tex}
+
+\begin{document}
+\pagenumbering{gobble}
+%\definecolor{lightblue}{cmyk}{0.83,0.24,0,0.12}
+\definecolor{lightblue}{rgb}{0.145,0.6666,1}
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+
+
+%% \begin{tikzpicture}[node distance = 0cm, auto, text width = 7em]
+%% %% \begin{center}
+
+%% \node[block, fill=lightblue, minimum height = 5em](expr){
+%% \begin{center}  \textbf{Expression} \end{center} };
+
+%% \node[block, right = 3cm of expr, fill=red, minimum height = 20em](gt){
+%% \begin{center} \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt}
+%%   \noindent\rule{\linewidth}{1pt} \end{center}};
+
+%% \node[above = of expr, text width = 8em]{ samples (1e3) $\rightarrow$};
+%% \node[left = of expr,  text width = 6em]{ genes (2e4) $\downarrow$};
+
+%% \node[above = of gt, text width = 8em]{ samples (1e3) $\rightarrow$};
+%% \node[left = of gt,  text width = 6em]{ SNPs (4e7) $\downarrow$};
+
+%% %% \end{center}
+%% \end{tikzpicture}
+
+
+
+
+
+\begin{tikzpicture}[node distance = 0cm, auto, text width = 7em]
+
+
+\node[block, fill=lightblue, minimum height = 5em](expr){
+\begin{center}  \textbf{Expression} \end{center} };
+
+\node[block, right = 3cm of expr, fill=red, minimum height = 20em](gt){
+\begin{center} \textbf{Genotype} \end{center}};
+
+\node[above = of expr, text width = 8em]{ samples (1e3) $\rightarrow$};
+\node[left = of expr,  text width = 6em]{ genes (2e4) $\downarrow$};
+
+\node[above = of gt, text width = 8em]{ samples (1e3) $\rightarrow$};
+\node[left = of gt,  text width = 6em]{ SNPs (4e7) $\downarrow$};
+
+\end{tikzpicture}
+
+\end{document}

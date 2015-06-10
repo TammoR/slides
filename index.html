@@ -28,7 +28,7 @@
 <h1>eQTL Analysis in Apache SPARK</h1>
 <h2>Tammo Rukat</h2>
 <h2><a href="mailto:tammorukat@gmail.com">tammorukat@gmail.com</a></h2>
-<h2>May 27, 2005</h2>
+<h2>June 15, 2015</h2>
 </section>
 <section id="table-of-contents">
 <div id="table-of-contents">
@@ -85,7 +85,7 @@
 <li data-fragment-index="3" class="fragment highlight-blue">Undergoing parallel operations</li>
 <li data-fragment-index="4" class="fragment highlight-blue">Resides in Memory</li>
 <li data-fragment-index="5" class="fragment highlight-blue">Evaluation is <b>lazy</b></li>
-<li data-fragment-index="6" class="fragment highlight-blue">RDDs are ephemeral, but there lineage is tracked.</li>
+<li data-fragment-index="6" class="fragment highlight-blue">RDDs are ephemeral, but their lineage is tracked.</li>
 
 </ul>
 
@@ -151,7 +151,7 @@ If we force computation, the output reads:
 </div>
 
 
-<font color="blue"><div align="left">Expression data (size: 1e3 x 2e5)</div></font>
+<font color="blue"><div align="left">Expression data (size: 1e3 x 2e4)</div></font>
 <div class="org-src-container">
 
 <pre  class="src src-python">CHROM START    END      ENTREZ_ID DESCRIPTION  HG1        HG2      HG3      HG4   ...
@@ -264,7 +264,15 @@ chr15 1033423   16050        CtoA     0.6175155
 
 </section>
 <section id="slide-sec-2-2">
-<h3 id="sec-2-2">Cis Analysis with Cartesian Product Method</h3>
+<h3 id="sec-2-2">Data Layout</h3>
+<p>
+<a href="./figures/tikz_test-crop.pdf">./figures/tikz_test-crop.pdf</a>
+</p>
+
+
+</section>
+<section id="slide-sec-2-3">
+<h3 id="sec-2-3">Cis Analysis with Cartesian Product Method</h3>
 <ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>
 
 <p>
@@ -285,8 +293,8 @@ What is the most time consuming step?
 </aside>
 
 </section>
-<section id="slide-sec-2-2-1">
-<h4 id="sec-2-2-1">Benchmark</h4>
+<section id="slide-sec-2-3-1">
+<h4 id="sec-2-3-1">Benchmark</h4>
 
 <div class="figure">
 <p><img src="./figures/benchmark_cpm_1_1.png" alt="benchmark_cpm_1_1.png" />
@@ -294,8 +302,8 @@ What is the most time consuming step?
 </div>
 
 </section>
-<section id="slide-sec-2-3">
-<h3 id="sec-2-3">Sparse Vector Method</h3>
+<section id="slide-sec-2-4">
+<h3 id="sec-2-4">Sparse Vector Method</h3>
 <p>
 Just like before, but the SNP representation exploits the sparsity.
 </p>
@@ -324,8 +332,8 @@ rs58768  SparseVector(2, {2:2, 4:1})
 
 
 </section>
-<section id="slide-sec-2-3-1">
-<h4 id="sec-2-3-1">Benchmark</h4>
+<section id="slide-sec-2-4-1">
+<h4 id="sec-2-4-1">Benchmark</h4>
 
 <div class="figure">
 <p><img src="./figures/benchmark_cpm_1_2.png" alt="benchmark_cpm_1_2.png" />
@@ -333,8 +341,8 @@ rs58768  SparseVector(2, {2:2, 4:1})
 </div>
 
 </section>
-<section id="slide-sec-2-4">
-<h3 id="sec-2-4">Ressource Dependency: Benchmark</h3>
+<section id="slide-sec-2-5">
+<h3 id="sec-2-5">Ressource Dependency: Benchmark</h3>
 <img src="figures/bm_half.png" frameborder="0" align="middle"> <br>
 <ul>
 <li>Scales nicely&#x2026;</li>
@@ -342,8 +350,8 @@ rs58768  SparseVector(2, {2:2, 4:1})
 </ul>
 
 </section>
-<section id="slide-sec-2-5">
-<h3 id="sec-2-5">Ressource Dependency: Benchmark (cont)</h3>
+<section id="slide-sec-2-6">
+<h3 id="sec-2-6">Ressource Dependency: Benchmark (cont)</h3>
 <img src="figures/bm_full.png" frameborder="0" align="middle"> <br>
 <ul>
 <li>&#x2026; up to 48 cores</li>
@@ -353,8 +361,8 @@ rs58768  SparseVector(2, {2:2, 4:1})
 
 
 </section>
-<section id="slide-sec-2-6">
-<h3 id="sec-2-6">Scaling with the number of genes</h3>
+<section id="slide-sec-2-7">
+<h3 id="sec-2-7">Scaling with the number of genes</h3>
 <img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>
 <ul>
 <li>Linear behaviour</li>
@@ -362,9 +370,14 @@ rs58768  SparseVector(2, {2:2, 4:1})
 </ul>
 
 </section>
-<section id="slide-sec-2-7">
-<h3 id="sec-2-7">Scaling with the number of genes [cont]</h3>
+<section id="slide-sec-2-8">
+<h3 id="sec-2-8">Scaling with the number of genes [cont]</h3>
 <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
+
+</section>
+<section id="slide-sec-2-9">
+<h3 id="sec-2-9">Full cis Analysis for chromosome 2</h3>
+<img src="figures/chrom2_full_bm.png" frameborder="0" align="middle"> <br>
 
 </section>
 </section>
@@ -372,8 +385,8 @@ rs58768  SparseVector(2, {2:2, 4:1})
 <section id="slide-sec-3">
 <h2 id="sec-3">Future Work</h2>
 <ul>
+<li class="fragment highlight-green">Implement Matrix method to avoid iterations.</li>
 <li class="fragment highlight-red">Improve the algorithm, especially the search of cis SNPs.</li>
-<li class="fragment highlight-red">Implement Matrix method to avoid iterations.</li>
 <li class="fragment highlight-red">Perform larger analyses (e.g. across chromosomes).</li>
 <li class="fragment highlight-blue">Statistical tests
 <ul>
@@ -382,6 +395,7 @@ rs58768  SparseVector(2, {2:2, 4:1})
 
 </ul></li>
 <li class="fragment highlight-blue">Account for covarites (e.g. by principal componente analysis)</li>
+<li class="fragment highlight-blue">Stratified analysis for gender, ethnicity, &#x2026;</li>
 
 </ul>
 
@@ -392,9 +406,9 @@ rs58768  SparseVector(2, {2:2, 4:1})
 Thanks to
 </p>
 <ul>
-<li><b>Satu Nahkuri</b> and <b>Barbara Endler-Jobst</b> at Roche</li>
-<li>The whole Roche pREDi Data Science</li>
-<li>Our supervisors in Oxford: <b>Chris Yau</b> and <b>Peter Humburg</b></li>
+<li>Supervisors in Oxford: <b>Chris Yau</b> and <b>Peter Humburg</b></li>
+<li>Industrial supervisors: <b>Satu Nahkuri</b> and <b>Barbara Endler-Jobst</b> at Roche</li>
+<li>The whole Roche pREDi Data Science team</li>
 <li>Our funding: EPSRC</li>
 
 </ul>

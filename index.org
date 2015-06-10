@@ -1,6 +1,6 @@
 #+TITLE: eQTL Analysis in Apache SPARK
 #+AUTHOR: Tammo Rukat
-#+DATE: May 27, 2005
+#+DATE: June 15, 2015
 #+Email: tammorukat@gmail.com
 
 
@@ -97,7 +97,7 @@
 - Undergoing parallel operations
 - Resides in Memory
 - Evaluation is *lazy*
-- RDDs are ephemeral, but there lineage is tracked.
+- RDDs are ephemeral, but their lineage is tracked.
 # - Computation happens were the data i
 
 ** Processing a text file with the Spark Python API
@@ -158,7 +158,7 @@ POS   ID       REFtoALT HG1     HG2     HG3     HG4     HG5     HG6  ...
 #+END_SRC
 
 
-#+REVEAL_HTML: <font color="blue"><div align="left">Expression data (size: 1e3 x 2e5)</div></font>
+#+REVEAL_HTML: <font color="blue"><div align="left">Expression data (size: 1e3 x 2e4)</div></font>
 #+BEGIN_SRC python
 CHROM START    END      ENTREZ_ID DESCRIPTION  HG1        HG2      HG3      HG4   ...
 chr15 25302005 25302102 133415    SNORD116_3   -1.5092   -1.4306  0.5507   1.3763 ...
@@ -254,6 +254,10 @@ chr15 1033423   16059        CtoA     0.7690654
 chr15 1033423   16050        CtoA     0.6175155  
 #+END_SRC
 
+** Data Layout
+   [[./figures/tikz_test-crop.pdf]]
+
+
 ** Cis Analysis with Cartesian Product Method
 #+REVEAL_HTML: <ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>  
 
@@ -319,19 +323,23 @@ rs58768  SparseVector(2, {2:2, 4:1})
 ** Scaling with the number of genes [cont]
 #+REVEAL_HTML: <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
 
+** Full cis Analysis for chromosome 2
+#+REVEAL_HTML: <img src="figures/chrom2_full_bm.png" frameborder="0" align="middle"> <br>
+
 * Future Work
-#+ATTR_REVEAL: :frag (highlight-red highlight-red highlight-red highlight-blue highlight-blue)
-  - Improve the algorithm, especially the search of cis SNPs.
+#+ATTR_REVEAL: :frag (highlight-green highlight-red highlight-red highlight-blue highlight-blue highlight-blue)
   - Implement Matrix method to avoid iterations.
+  - Improve the algorithm, especially the search of cis SNPs.
   - Perform larger analyses (e.g. across chromosomes).
   - Statistical tests
     + Simple significance test with multiple comparsion correction.
     + Resampling tests, Bootstrap.
   - Account for covarites (e.g. by principal componente analysis)
+  - Stratified analysis for gender, ethnicity, ...
 
 ** Acknowledgments
 Thanks to
-- *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
-- The whole Roche pREDi Data Science
-- Our supervisors in Oxford: *Chris Yau* and *Peter Humburg*
+- Supervisors in Oxford: *Chris Yau* and *Peter Humburg*
+- Industrial supervisors: *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
+- The whole Roche pREDi Data Science team
 - Our funding: EPSRC
