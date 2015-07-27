@@ -1,6 +1,6 @@
 #+TITLE: eQTL Analysis in Apache SPARK
 #+AUTHOR: Tammo Rukat
-#+DATE: July 27, 2015
+#+DATE: June 10, 2015
 #+Email: tammorukat@gmail.com
 
 
@@ -172,6 +172,7 @@ chr15 25299355 25299452 103414    SNORD116_2   0.143     -1.2503  1.8367   -0.77
 
 #+END_SRC
 
+
 ** Spark data frames
   :PROPERTIES:
   :reveal_background: figures/spark-logo5.png
@@ -214,6 +215,8 @@ POS    ID      REFtoALT HG1 HG2 HG3 HG4 HG5 HG6 HG7 HG8 ...
 #+END_SRC
 
 
+
+
 # show output and example queries
 
 * eQTL Analysis in Spark
@@ -252,27 +255,31 @@ chr15 1033423   16050        CtoA     0.6175155
 #+END_SRC
 
 ** Data Layout
-#+REVEAL_HTML: <img data-src="/home/tammo/Dropbox/eQTLs/git_reveal/figures/tikz_test-crop-1.png" alt="Mountain View" style="width:700px;height:500px;">
+   [[./figures/tikz_test-crop.pdf]]
 
-- Expression: vertical factor 20
-- Genotype: vertical factor 10,000
 
-   
 ** Cis Analysis with Cartesian Product Method
-1. _Load and cache_ the data into *distributed* RDDs
-2. Filter genotype and expression data, to contain identical samples in identical order.
-3. Filter for genes or SNPs that are not expressed in at least 5 (or 5%) of the samples.
-4. Translate genotype codes to integer numbers (e.g. 0|1 → 1 or 1|1 → 2).
-5. Materialize gene expression data and broadcast a copy to every worker node.
+#+REVEAL_HTML: <ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>  
 
-_Iterate_ for every desired gene:
+# 1. _Load and cache_ the data into *distributed* Spark data frames
+# 2. _Select_ the quantitative traits (genes) for analysis.
+# 3. _Broadcast_ an array with the _position_ of the genes to every worker node
 
-1. _Filter_ SNPs to be close enough (cis) to the current gene.
-2. Map the correlation function onto the RDD of remaining SNPs.
-   - Calculate Spearman correlation and (if applicable) p-value.
-   - Return a tuple: (p-value, SNP-index, gene-index)
+_Iterate_ for every gene:
 
-** Cis Analysis: Benchmark
+#+REVEAL_HTML: <ol type="a"><li><b>Filter</b> <font color="red">SNPs</font> to be close enough (cis) to the current gene. </li> <li> <b>Broadcast</b> the <font color="blue">gene's expression</font> data to every worker node.</li> <li> <b>Calculate correlations</b> of the gene expression with every SNP.</li></ol>
+
+# 1. _Filter_ SNPs to be close enough (cis) to the current gene.
+# 2. _Broadcast_ the _gene's expression_ data to every worker node.
+# 3. _Calculate correlations_ of the gene expression with every SNP.
+
+=4.= Join results into data frame.
+
+#+BEGIN_NOTES
+What is the most time consuming step?
+#+END_NOTES
+
+*** Benchmark
      [[./figures/benchmark_cpm_1_1.png]]
 
 ** Sparse Vector Method
@@ -294,49 +301,45 @@ rs58764  SparseVector(1, {3:1})
 rs58768  SparseVector(2, {2:2, 4:1})     
 #+END_SRC
 
-** Sparse cis Analysis: Benchmark
-#+REVEAL_HTML: <img data-src="/home/tammo/Dropbox/eQTLs/report/figures/cis_benchmark-crop-1.png" alt="Mountain View" style="width:800px;height:600px;">
 
-** Trans Analysis
-- Roughly the same first steps as the cis algorithm.
-- Not necessary to iterate over every gene and pick out the relevant SNPs every time.
-- Instead of an array of desired genes, the SNP RDD becomes the pivotal object of computation.
-- This greatly improves the effective degree of parallelism.
+*** Benchmark
+     [[./figures/benchmark_cpm_1_2.png]]
 
-** Trans Analysis: Benchmarks 1
-#+REVEAL_HTML: <img data-src="/home/tammo/Dropbox/eQTLs/report/figures/full_analysis_SNPtimings-crop-1.png" alt="Mountain View" style="width:900px;height:600px;">
-- 3-4 orders of magnitude faster than the trans analysis.
+** Ressource Dependency: Benchmark
 
-** Trans Analysis: Benchmarks 2
-#+REVEAL_HTML: <img data-src="/home/tammo/Dropbox/eQTLs/report/figures/full_analysis_core_timings-crop-1.png" alt="Mountain View" style="width:800px;height:600px;">
+#+REVEAL_HTML: <img src="figures/bm_half.png" frameborder="0" align="middle"> <br>  
+- Scales nicely...
+  
+** Ressource Dependency: Benchmark (cont)
+#+REVEAL_HTML: <img src="figures/bm_full.png" frameborder="0" align="middle"> <br>  
+- ... up to 48 cores
 
-** Trans Analysis: Benchmarks 3
-- A full trans analysis of the 1000 Genomes data on 786 worker nodes, each with 16 GB memory, calculating more than 3 × 10¹¹ correlations, takes approximately 90 minutes.
-* Results
-#+REVEAL_HTML: <img data-src="/home/tammo/Dropbox/eQTLs/report/figures/circos2.png" alt="Mountain View" style="width:600px;height:600px;">
 
-* Conclusion & Discussion
-- We developed a scalable algorithm for trans eQTL analysis
-- Spark is very well suited to emberassingly parallel problems, and potentially also for more complex problems.
-- Spark is under vivid development. Libraries for machine learning and stream processing are becoming mature.
-- Spark is easy to work with (compared to other parallel platforms) and offers APIs in scala (native), python, java, and R.
-- For this type of analysis GPUs could be a viable alternative
+
+** Scaling with the number of genes
+#+REVEAL_HTML: <img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>  
+- Linear behaviour
+
+** Scaling with the number of genes [cont]
+#+REVEAL_HTML: <img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
+
+** Full cis Analysis for chromosome 2
+#+REVEAL_HTML: <img src="figures/chrom2_full_bm.png" frameborder="0" align="middle"> <br>
+
+* Future Work
+#+ATTR_REVEAL: :frag (highlight-green highlight-red highlight-red highlight-blue highlight-blue highlight-blue)
+  - Implement Matrix method to avoid iterations.
+  - Improve the algorithm, especially the search of cis SNPs.
+  - Perform larger analyses (e.g. across chromosomes).
+  - Statistical tests
+    + Simple significance test with multiple comparsion correction.
+    + Resampling tests, Bootstrap.
+  - Account for covarites (e.g. by principal componente analysis)
+  - Stratified analysis for gender, ethnicity, ...
 
 ** Acknowledgments
 Thanks to
-- Industrial supervisors: *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
 - Supervisors in Oxford: *Chris Yau* and *Peter Humburg*
+- Industrial supervisors: *Satu Nahkuri* and *Barbara Endler-Jobst* at Roche
 - The whole Roche pREDi Data Science team
 - Our funding: EPSRC
-
-# * Future Work
-# #+ATTR_REVEAL: :frag (highlight-green highlight-red highlight-red highlight-blue highlight-blue highlight-blue)
-#   - Implement Matrix method to avoid iterations.
-#   - Improve the algorithm, especially the search of cis SNPs.
-#   - Perform larger analyses (e.g. across chromosomes).
-#   - Statistical tests
-#     + Simple significance test with multiple comparsion correction.
-#     + Resampling tests, Bootstrap.
-#   - Account for covarites (e.g. by principal componente analysis)
-#   - Stratified analysis for gender, ethnicity, ...
-

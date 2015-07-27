@@ -28,7 +28,7 @@
 <h1>eQTL Analysis in Apache SPARK</h1>
 <h2>Tammo Rukat</h2>
 <h2><a href="mailto:tammorukat@gmail.com">tammorukat@gmail.com</a></h2>
-<h2>June 15, 2015</h2>
+<h2>July 27, 2015</h2>
 </section>
 <section id="table-of-contents">
 <div id="table-of-contents">
@@ -37,7 +37,8 @@
 <ul>
 <li><a href="#/slide-sec-1">Apache Spark</a></li>
 <li><a href="#/slide-sec-2">eQTL Analysis in Spark</a></li>
-<li><a href="#/slide-sec-3">Future Work</a></li>
+<li><a href="#/slide-sec-3">Results</a></li>
+<li><a href="#/slide-sec-4">Conclusion &amp; Discussion</a></li>
 </ul>
 </div>
 </div>
@@ -111,8 +112,8 @@ Clean up comments and columns
 </p></span>
 <div class="org-src-container">
 
-<pre  class="fragment roll-in"><span style="color: #eedd82;">genotype</span> = spark.textFile(<span style="color: #ffa07a;">'input.txt'</span>)
-<span style="color: #eedd82;">genotype</span> = genotype.<span style="color: #b0c4de;">filter</span>(<span style="color: #00ffff;">lambda</span> row: row[0] != <span style="color: #ffa07a;">'#'</span>).<span style="color: #b0c4de;">map</span>(<span style="color: #00ffff;">lambda</span> row: row.split(<span style="color: #ffa07a;">'\t'</span>))
+<pre  class="fragment roll-in">genotype = spark.textFile('input.txt')
+genotype = genotype.filter(lambda row: row[0] != '#').map(lambda row: row.split('\t'))
 </pre>
 </div>
 
@@ -122,11 +123,11 @@ If we force computation, the output reads:
 
 <div class="org-src-container">
 
-<pre  class="fragment roll-in">[[22, 160575, <span style="color: #ffa07a;">'rs58769'</span>, <span style="color: #ffa07a;">'A'</span>, <span style="color: #ffa07a;">'G'</span>,    <span style="color: #ffa07a;">'PASS'</span>, <span style="color: #ffa07a;">'1|0'</span>, <span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>]
- [22, 160576, <span style="color: #ffa07a;">'rs58762'</span>, <span style="color: #ffa07a;">'G'</span>, <span style="color: #ffa07a;">'A,C'</span>,  <span style="color: #ffa07a;">'PASS'</span>, <span style="color: #ffa07a;">'0|0'</span>, <span style="color: #ffa07a;">'2|2'</span>,<span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>]
- [22, 160577, <span style="color: #ffa07a;">'rs58763'</span>, <span style="color: #ffa07a;">'C'</span>, <span style="color: #ffa07a;">'TATA'</span>, <span style="color: #ffa07a;">'PASS'</span>, <span style="color: #ffa07a;">'1|1'</span>, <span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|1'</span>]
- [22, 160578, <span style="color: #ffa07a;">'rs58764'</span>, <span style="color: #ffa07a;">'C'</span>, <span style="color: #ffa07a;">'T'</span>,    <span style="color: #ffa07a;">'PASS'</span>, <span style="color: #ffa07a;">'0|0'</span>, <span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>]
- [22, 160579, <span style="color: #ffa07a;">'rs58767'</span>, <span style="color: #ffa07a;">'C'</span>, <span style="color: #ffa07a;">'A'</span>,    <span style="color: #ffa07a;">'PASS'</span>, <span style="color: #ffa07a;">'0|0'</span>, <span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>,<span style="color: #ffa07a;">'0|0'</span>]]
+<pre  class="fragment roll-in">[[22, 160575, 'rs58769', 'A', 'G',    'PASS', '1|0', '0|0','0|0','0|0']
+ [22, 160576, 'rs58762', 'G', 'A,C',  'PASS', '0|0', '2|2','0|0','0|0']
+ [22, 160577, 'rs58763', 'C', 'TATA', 'PASS', '1|1', '0|0','0|0','0|1']
+ [22, 160578, 'rs58764', 'C', 'T',    'PASS', '0|0', '0|0','0|0','0|0']
+ [22, 160579, 'rs58767', 'C', 'A',    'PASS', '0|0', '0|0','0|0','0|0']]
 </pre>
 </div>
 
@@ -166,7 +167,6 @@ chr15 25299355 25299452 103414    SNORD116_2   0.143     -1.2503  1.8367   -0.77
 </pre>
 </div>
 
-
 </section>
 <section id="slide-sec-1-3" data-background="figures/spark-logo5.png" data-background-size="900px" data-background-transition="fading">
 <h3 id="sec-1-3">Spark data frames</h3>
@@ -184,7 +184,7 @@ Find a particular SNP
 
 <div class="org-src-container">
 
-<pre  class="fragment roll-in">SNP_df.<span style="color: #b0c4de;">filter</span>(SNP_df.POS == 160576).show()
+<pre  class="fragment roll-in">SNP_df.filter(SNP_df.POS == 160576).show()
 </pre>
 </div>
 
@@ -228,14 +228,14 @@ Genotype and expression data have been loaded into data frames.
 </p>
 <div class="org-src-container">
 
-<pre  class="src src-python"><span style="color: #eedd82;">SNP_df</span> = load_genotype_data(<span style="color: #ffa07a;">'genotype.vcf'</span>)
-<span style="color: #eedd82;">epx_df</span> = load_expression_data(<span style="color: #ffa07a;">'expression.gct'</span>)
-<span style="color: #eedd82;">gene_ids</span> = <span style="color: #ffa07a;">'all'</span>
-<span style="color: #eedd82;">eQTLs</span> = cartesian_product_method(SNP_df, exp_df,\
-                     gene_ids,\
-                     max_distance=1e6,\
-                     sign_level = .6,\
-                     outname = <span style="color: #ffa07a;">'my_eQTL_analysis.out'</span>)
+<pre  class="src src-python">SNP_df = load_genotype_data('genotype.vcf')
+epx_df = load_expression_data('expression.gct')
+gene_ids = 'all'
+eQTLs = cartesian_product_method(SNP_df, exp_df,\
+                                         gene_ids,\
+                                         max_distance=1e6,\
+                                         sign_level = .6,\
+                                         outname = 'my_eQTL_analysis.out')
 
 eQTLs.show()
 </pre>
@@ -265,36 +265,45 @@ chr15 1033423   16050        CtoA     0.6175155
 </section>
 <section id="slide-sec-2-2">
 <h3 id="sec-2-2">Data Layout</h3>
-<p>
-<a href="./figures/tikz_test-crop.pdf">./figures/tikz_test-crop.pdf</a>
-</p>
+<img data-src="/home/tammo/Dropbox/eQTLs/git_reveal/figures/tikz_test-crop-1.png" alt="Mountain View" style="width:700px;height:500px;">
+
+<ul>
+<li>Expression: vertical factor 20</li>
+<li>Genotype: vertical factor 10,000</li>
+
+</ul>
 
 
 </section>
 <section id="slide-sec-2-3">
 <h3 id="sec-2-3">Cis Analysis with Cartesian Product Method</h3>
-<ol>  <li><b>Load and cache</b> the data into distributed Spark data frames</li>   <li><b>Select</b> the <font color="blue">quantitative traits (genes)</font> for analysis.</li>  <li> Broadcast an array with the <b>position</b> of the genes to every worker node</li> </ol>
+<ol>
+<li><span class="underline">Load and cache</span> the data into <b>distributed</b> RDDs</li>
+<li>Filter genotype and expression data, to contain identical samples in identical order.</li>
+<li>Filter for genes or SNPs that are not expressed in at least 5 (or 5%) of the samples.</li>
+<li>Translate genotype codes to integer numbers (e.g. 0|1 → 1 or 1|1 → 2).</li>
+<li>Materialize gene expression data and broadcast a copy to every worker node.</li>
+
+</ol>
 
 <p>
-<span class="underline">Iterate</span> for every gene:
+<span class="underline">Iterate</span> for every desired gene:
 </p>
 
-<ol type="a"><li><b>Filter</b> <font color="red">SNPs</font> to be close enough (cis) to the current gene. </li> <li> <b>Broadcast</b> the <font color="blue">gene's expression</font> data to every worker node.</li> <li> <b>Calculate correlations</b> of the gene expression with every SNP.</li></ol>
+<ol>
+<li><span class="underline">Filter</span> SNPs to be close enough (cis) to the current gene.</li>
+<li>Map the correlation function onto the RDD of remaining SNPs.
+<ul>
+<li>Calculate Spearman correlation and (if applicable) p-value.</li>
+<li>Return a tuple: (p-value, SNP-index, gene-index)</li>
 
-<p>
-<code>4.</code> Join results into data frame.
-</p>
+</ul></li>
 
-<aside class="notes">
-<p>
-What is the most time consuming step?
-</p>
-
-</aside>
+</ol>
 
 </section>
-<section id="slide-sec-2-3-1">
-<h4 id="sec-2-3-1">Benchmark</h4>
+<section id="slide-sec-2-4">
+<h3 id="sec-2-4">Cis Analysis: Benchmark</h3>
 
 <div class="figure">
 <p><img src="./figures/benchmark_cpm_1_1.png" alt="benchmark_cpm_1_1.png" />
@@ -302,8 +311,8 @@ What is the most time consuming step?
 </div>
 
 </section>
-<section id="slide-sec-2-4">
-<h3 id="sec-2-4">Sparse Vector Method</h3>
+<section id="slide-sec-2-5">
+<h3 id="sec-2-5">Sparse Vector Method</h3>
 <p>
 Just like before, but the SNP representation exploits the sparsity.
 </p>
@@ -330,84 +339,73 @@ rs58768  SparseVector(2, {2:2, 4:1})
 </pre>
 </div>
 
-
-</section>
-<section id="slide-sec-2-4-1">
-<h4 id="sec-2-4-1">Benchmark</h4>
-
-<div class="figure">
-<p><img src="./figures/benchmark_cpm_1_2.png" alt="benchmark_cpm_1_2.png" />
-</p>
-</div>
-
-</section>
-<section id="slide-sec-2-5">
-<h3 id="sec-2-5">Ressource Dependency: Benchmark</h3>
-<img src="figures/bm_half.png" frameborder="0" align="middle"> <br>
-<ul>
-<li>Scales nicely&#x2026;</li>
-
-</ul>
-
 </section>
 <section id="slide-sec-2-6">
-<h3 id="sec-2-6">Ressource Dependency: Benchmark (cont)</h3>
-<img src="figures/bm_full.png" frameborder="0" align="middle"> <br>
-<ul>
-<li>&#x2026; up to 48 cores</li>
-
-</ul>
-
-
+<h3 id="sec-2-6">Sparse cis Analysis: Benchmark</h3>
+<img data-src="/home/tammo/Dropbox/eQTLs/report/figures/cis_benchmark-crop-1.png" alt="Mountain View" style="width:800px;height:600px;">
 
 </section>
 <section id="slide-sec-2-7">
-<h3 id="sec-2-7">Scaling with the number of genes</h3>
-<img src="figures/gene_scaling_bm.png" frameborder="0" align="middle"> <br>
+<h3 id="sec-2-7">Trans Analysis</h3>
 <ul>
-<li>Linear behaviour</li>
+<li>Roughly the same first steps as the cis algorithm.</li>
+<li>It is not necessary to over every gene and pick out the relevant SNPs every time.</li>
+<li>Instead of an array of desired genes, the SNP RDD becomes the pivotal object of computation.</li>
+<li>This greatly improves the effective degree of parallelism.</li>
 
 </ul>
 
 </section>
 <section id="slide-sec-2-8">
-<h3 id="sec-2-8">Scaling with the number of genes [cont]</h3>
-<img src="figures/gene_scaling_bm_full.png" frameborder="0" align="middle"> <br>
-
-</section>
-<section id="slide-sec-2-9">
-<h3 id="sec-2-9">Full cis Analysis for chromosome 2</h3>
-<img src="figures/chrom2_full_bm.png" frameborder="0" align="middle"> <br>
-
-</section>
-</section>
-<section>
-<section id="slide-sec-3">
-<h2 id="sec-3">Future Work</h2>
+<h3 id="sec-2-8">Trans Analysis: Benchmarks 1</h3>
+<img data-src="/home/tammo/Dropbox/eQTLs/report/figures/full_analysis_SNPtimings-crop-1.png" alt="Mountain View" style="width:900px;height:600px;">
 <ul>
-<li class="fragment highlight-green">Implement Matrix method to avoid iterations.</li>
-<li class="fragment highlight-red">Improve the algorithm, especially the search of cis SNPs.</li>
-<li class="fragment highlight-red">Perform larger analyses (e.g. across chromosomes).</li>
-<li class="fragment highlight-blue">Statistical tests
-<ul>
-<li>Simple significance test with multiple comparsion correction.</li>
-<li>Resampling tests, Bootstrap.</li>
-
-</ul></li>
-<li class="fragment highlight-blue">Account for covarites (e.g. by principal componente analysis)</li>
-<li class="fragment highlight-blue">Stratified analysis for gender, ethnicity, &#x2026;</li>
+<li>3-4 orders of magnitude faster than the trans analysis.</li>
 
 </ul>
 
 </section>
-<section id="slide-sec-3-1">
-<h3 id="sec-3-1">Acknowledgments</h3>
+<section id="slide-sec-2-9">
+<h3 id="sec-2-9">Trans Analysis: Benchmarks 2</h3>
+<img data-src="/home/tammo/Dropbox/eQTLs/report/figures/full_analysis_core_timings-crop-1.png" alt="Mountain View" style="width:800px;height:600px;">
+
+</section>
+<section id="slide-sec-2-10">
+<h3 id="sec-2-10">Trans Analysis: Benchmarks 3</h3>
+<ul>
+<li>A full trans analysis of the 1000 Genomes data on 786 worker nodes, each with 16 GB memory, calculating more than 3 × 10¹¹ correlations, takes approximately 90 minutes.</li>
+
+</ul>
+</section>
+</section>
+<section>
+<section id="slide-sec-3">
+<h2 id="sec-3">Results</h2>
+<img data-src="/home/tammo/Dropbox/eQTLs/report/figures/circos2.png" alt="Mountain View" style="width:600px;height:600px;">
+
+</section>
+</section>
+<section>
+<section id="slide-sec-4">
+<h2 id="sec-4">Conclusion &amp; Discussion</h2>
+<ul>
+<li>We developed a scalable algorithm for trans eQTL analysis</li>
+<li>Spark is very well suited to emberassingly parallel problems, and potentially also for more complex problems.</li>
+<li>Spark is under vivid development. Libraries for machine learning and stream processing are becoming mature.</li>
+<li>Spark is easy to work with (compared to other parallel platforms) and offers APIs in scala (native), python, java, and R.</li>
+<li>For this type of analysis GPUs could be a viable alternative</li>
+
+</ul>
+
+</section>
+<section id="slide-sec-4-1">
+<h3 id="sec-4-1">Acknowledgments</h3>
 <p>
 Thanks to
 </p>
 <ul>
-<li>Supervisors in Oxford: <b>Chris Yau</b> and <b>Peter Humburg</b></li>
 <li>Industrial supervisors: <b>Satu Nahkuri</b> and <b>Barbara Endler-Jobst</b> at Roche</li>
+<li>Supervisors in Oxford: <b>Chris Yau</b> and <b>Peter Humburg</b></li>
 <li>The whole Roche pREDi Data Science team</li>
 <li>Our funding: EPSRC</li>
 
